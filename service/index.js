@@ -1,7 +1,14 @@
-const { Contact } = require("./schemas/contact");
+const { Contact } = require("../models/schemas/contact");
 
-const getAllContacts = async () => {
-  const result = await Contact.find();
+const getAllContacts = async (owner, query) => {
+  const { limit = 10, page = 1 } = query;
+  const skip = (page - 1) * limit;
+  console.log(skip);
+  const result = await Contact.find({ owner }, "-createdAt -updatedAt", {
+    skip,
+    limit,
+  }).populate("owner", "_id");
+  console.log(result);
   return result;
 };
 

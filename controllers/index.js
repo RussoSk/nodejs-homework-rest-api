@@ -14,9 +14,10 @@ const {
     updateStatusContact,
   } = require("../service");
   
-  const get = async (_, res, next) => {
+  const get = async (req, res, next) => {
     try {
-      const contacts = await getAllContacts();
+      const { _id: owner } = req.user;
+      const contacts = await getAllContacts(owner, req.query);
       res.json(contacts);
     } catch (e) {
       next(e);
@@ -26,7 +27,6 @@ const {
   const getOne = async (req, res, next) => {
     try {
       const { contactId } = req.params;
-      console.log("getOne");
       const contact = await getContactById(contactId);
       if (!contact) {
         throw HttpError(404, "Not found");
@@ -39,16 +39,17 @@ const {
   
   const add = async (res, req, next) => {
     try {
+      const { _id: owner } = req.req.user;
       const body = req.req.body;
       const { error } = validateData.validateBody(body);
       if (error) {
         addRequestError(res, error);
         return;
       }
-      const contact = await addContact(body);
+      const contact = await addContact({ ...body, owner });
       res.res.status(201).json(contact);
     } catch (e) {
-      next();
+      next(e);
     }
   };
   
