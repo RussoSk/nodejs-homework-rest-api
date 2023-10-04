@@ -7,20 +7,21 @@ const {
     updateStatus,
   } = require("../controllers");
   
+  const { authenticate } = require("../middlewares");
   const express = require("express");
   
   const router = express.Router();
   
-  router.get("/", get);
+  router.get("/", authenticate, get);
   
-  router.get("/:contactId", getOne);
+  router.get("/:contactId", authenticate, getOne);
   
-  router.delete("/:contactId", remove);
+  router.delete("/:contactId", authenticate, remove);
   
-  router.post("/", add);
+  router.post("/", authenticate, add);
   
-  router.put("/:contactId", update);
+  router.put("/:contactId", authenticate, update);
   
-  router.patch("/:contactId/favorite", updateStatus);
+  router.patch("/:contactId/favorite", authenticate, updateStatus);
   
   module.exports = router;

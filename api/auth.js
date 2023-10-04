@@ -8,6 +8,7 @@ const {
   currentUser,
   logoutUser,
 } = require("../controllers/auth");
+
 const { authenticate } = require("../middlewares");
 
 authRouter.post("/register", registerUser);
