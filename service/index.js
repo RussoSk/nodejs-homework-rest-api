@@ -12,48 +12,56 @@ const getAllContacts = async (owner, query) => {
   return result;
 };
 
-const getContactById = async (contactId) => {
+const getContactById = async (contactId, owner) => {
   if (contactId.match(/^[0-9a-fA-F]{24}$/)) {
-    const result = await Contact.findById(contactId);
+    const result = await Contact.findOne({ _id: contactId, owner });
     return result;
   }
   return null;
 };
 
-const removeContact = async (contactId) => {
-  const currentContact = await getContactById(contactId);
+const removeContact = async (contactId, owner) => {
+  const currentContact = await getContactById(contactId, owner);
   if (!currentContact) {
     return null;
   }
-  await Contact.findByIdAndRemove(contactId);
+  await Contact.findOneAndRemove({ _id: contactId, owner });
   return currentContact;
 };
 
-const addContact = async (body) => {
-  const result = await Contact.create(body);
+const addContact = async (body, owner) => {
+  const result = await Contact.create({ ...body, owner });
   return result;
 };
 
-const updateContact = async (contactId, body) => {
-  const currentContact = await getContactById(contactId);
+const updateContact = async (contactId, body, owner) => {
+  const currentContact = await getContactById(contactId, owner);
   if (!currentContact) {
     return null;
   }
-  const result = await Contact.findByIdAndUpdate(contactId, body, {
-    new: true,
-  });
+  const result = await Contact.findOneAndUpdate(
+    { _id: contactId, owner },
+    body,
+    {
+      new: true,
+    }
+  );
   return result;
 };
 
-const updateStatusContact = async (contactId, body) => {
-  const currentContact = await getContactById(contactId);
+const updateStatusContact = async (contactId, body, owner) => {
+  const currentContact = await getContactById(contactId, owner);
   if (!currentContact) {
     return null;
   }
 
-  const result = await Contact.findByIdAndUpdate(contactId, body, {
-    new: true,
-  });
+  const result = await Contact.findOneAndUpdate(
+    { _id: contactId, owner },
+    body,
+    {
+      new: true,
+    }
+  );
   return result;
 };
 
