@@ -14,9 +14,10 @@ const {
     updateStatusContact,
   } = require("../service");
   
-  const get = async (_, res, next) => {
+  const get = async (req, res, next) => {
     try {
-      const contacts = await getAllContacts();
+      const owner = req.user._id;
+      const contacts = await getAllContacts(owner, req.query);
       res.json(contacts);
     } catch (e) {
       next(e);
@@ -26,29 +27,34 @@ const {
   const getOne = async (req, res, next) => {
     try {
       const { contactId } = req.params;
-      console.log("getOne");
       const contact = await getContactById(contactId);
-      if (!contact) {
+  
+      if (!contact || contact.owner.toString() !== req.user._id) {
         throw HttpError(404, "Not found");
       }
+  
       res.json(contact);
     } catch (e) {
       next(e);
     }
   };
   
+  
   const add = async (res, req, next) => {
     try {
-      const body = req.req.body;
+      const owner = req.user._id; 
+      const body = req.body;
       const { error } = validateData.validateBody(body);
+  
       if (error) {
         addRequestError(res, error);
         return;
       }
-      const contact = await addContact(body);
-      res.res.status(201).json(contact);
+  
+      const contact = await addContact({ ...body, owner });
+      res.status(201).json(contact);
     } catch (e) {
-      next();
+      next(e);
     }
   };
   
@@ -56,9 +62,11 @@ const {
     try {
       const { contactId } = req.params;
       const contact = await removeContact(contactId);
-      if (!contact) {
+  
+      if (!contact || contact.owner.toString() !== req.user._id) {
         throw HttpError(404, "Not found");
       }
+  
       res.json({
         message: "contact deleted",
       });
@@ -78,12 +86,13 @@ const {
         requestError(res, error);
       }
   
-      const contact = await updateContact(contactId, body);
-  
-      if (!contact) {
+      const contact = await getContactById(contactId);
+      if (!contact || contact.owner.toString() !== req.user._id) {
         throw HttpError(404, "Not found");
       }
-      res.json(contact);
+  
+      const updatedContact = await updateContact(contactId, body);
+      res.json(updatedContact);
     } catch (e) {
       next(e);
     }
@@ -101,11 +110,13 @@ const {
         return;
       }
   
-      const contact = await updateStatusContact(contactId, body);
-      if (!contact) {
+      const contact = await getContactById(contactId);
+      if (!contact || contact.owner.toString() !== req.user._id) {
         throw HttpError(404, "Not found");
       }
-      res.json(contact);
+  
+      const updatedContact = await updateStatusContact(contactId, body);
+      res.json(updatedContact);
     } catch (e) {
       next(e);
     }

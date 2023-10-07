@@ -37,10 +37,14 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
   { versionKey: false, timestamps: false }
 );
 
 const Contact = mongoose.model("contacts", contactSchema);
 
-module.exports = { Contact, addSchema, statusSchema};
+module.exports = { Contact, addSchema, statusSchema };
