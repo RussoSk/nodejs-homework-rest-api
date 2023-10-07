@@ -35,7 +35,7 @@ const addContact = async (body, owner) => {
 };
 
 const updateContact = async (contactId, body, owner) => {
-  const currentContact = await getContactById(contactId, owner);
+  const currentContact = await getContactById(contactId);
   if (!currentContact) {
     return null;
   }
@@ -50,7 +50,7 @@ const updateContact = async (contactId, body, owner) => {
 };
 
 const updateStatusContact = async (contactId, body, owner) => {
-  const currentContact = await getContactById(contactId, owner);
+  const currentContact = await getContactById(contactId);
   if (!currentContact) {
     return null;
   }
