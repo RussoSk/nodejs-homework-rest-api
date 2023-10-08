@@ -10,7 +10,11 @@ const createToken = (id) => {
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
   return token;
   
+  
 };
 
+const token = createToken(); 
+
+console.log("Отриманий токен:", token);
 
 module.exports = createToken;

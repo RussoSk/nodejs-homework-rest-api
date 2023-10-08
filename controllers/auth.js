@@ -1,8 +1,14 @@
 const bcrypt = require("bcrypt");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+
 
 const { validateData } = require("../utils/validateData");
-const { register, login, updateToken, logout } = require("../service/auth");
+const { register, login, updateToken, logout, updateUserAvatar} = require("../service/auth");
 const createToken = require("../utils/jwt");
+const resizeAvatar = require("../utils/resizeAvatar.js");
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
 const registerUser = async (req, res, next) => {
   try {
@@ -11,10 +17,12 @@ const registerUser = async (req, res, next) => {
     validateData.validateUser(res, req.body);
 
     const hashPassword = await bcrypt.hash(password, 10);
+    const avatarURL = gravatar.url(email);
 
     const newUser = await register({
       email: email.trim(),
       password: hashPassword,
+      avatarURL,
     });
 
     res.status(201).json({
@@ -73,9 +81,26 @@ const currentUser = async (req, res, next) => {
   res.json({ email, subscription });
 };
 
+const updateAvatar = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { path: tempUpload, originalname } = req.file;
+    await resizeAvatar(tempUpload);
+    const fileName = `${_id}_${originalname}`;
+    const resultUpload = path.join(avatarsDir, fileName);
+    await fs.rename(tempUpload, resultUpload);
+    const avatarURL = path.join("avatars", fileName);
+    await updateUserAvatar(_id, avatarURL);
+    res.json({ avatarURL });
+  } catch (e) {
+    res.status(400).json({ message: "No files" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   currentUser,
   logoutUser,
+  updateAvatar,
 };

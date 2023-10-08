@@ -23,10 +23,15 @@ const updateToken = async (id, token) => {
   await User.findByIdAndUpdate(id, { token });
 };
 
+const updateUserAvatar = async (id, avatar) => {
+  await User.findByIdAndUpdate(id, { avatarURL: avatar });
+};
+
 module.exports = {
   register,
   login,
   logout,
   findUser,
   updateToken,
+  updateUserAvatar,
 };
