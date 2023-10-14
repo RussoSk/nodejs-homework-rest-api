@@ -5,6 +5,10 @@ const register = async (body) => {
   return result;
 };
 
+const verifycateEmail = async (userId) => {
+  await User.findByIdAndUpdate(userId, { verify: true, verificationCode: "" });
+};
+
 const login = async (body) => {
   const user = await User.findOne({ email: body.email });
   return user || null;
@@ -34,4 +38,5 @@ module.exports = {
   findUser,
   updateToken,
   updateUserAvatar,
+  verifycateEmail,
 };

@@ -8,12 +8,18 @@ const {
   currentUser,
   logoutUser,
   updateAvatar,
+  verifyEmail,
+  resendVerificationEmail
 
 } = require("../controllers/auth");
 
 const { authenticate, upload} = require("../middlewares");
 
 authRouter.post("/register", registerUser);
+
+authRouter.get("/verify/:verificationCode", verifyEmail);
+
+authRouter.post("/verify", resendVerificationEmail);
 
 authRouter.post("/login", loginUser);
 
